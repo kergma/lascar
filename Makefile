@@ -1,2 +1,2 @@
 test: test.c
-	g++ -o test test.c
+	gcc -o test test.c
