@@ -2,11 +2,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
+
 #include <unistd.h>
 
 #define BUFLEN 512
-#define PORT 8010
+#define PORT "8010"
 
 void die(char *s)
 {
@@ -17,41 +20,63 @@ void die(char *s)
 int main (int argc, char *argv[])
 {
 	struct sockaddr_in si_me, si_other;
+	struct addrinfo hints, *listener8010;
 
-	int s, i, slen = sizeof(si_other) , received;
+	int s8010, slen = sizeof(si_other) , received;
 	char buf[BUFLEN];
 
-	if ((s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+	memset(&hints,0,sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_PASSIVE;
+	if (getaddrinfo(NULL, PORT, &hints, &listener8010) != 0)
 	{
-		die("cannot create socket");
+		die("getaddrinfo");
 	};
 
-	memset((char *) &si_me, 0, sizeof(si_me));
-
-	si_me.sin_family = AF_INET;
-	si_me.sin_port = htons(PORT);
-	si_me.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	if( bind(s, (struct sockaddr*)&si_me, sizeof(si_me) ) == -1)
+	if ((s8010=socket(listener8010->ai_family, listener8010->ai_socktype, listener8010->ai_protocol)) == -1)
 	{
-		die("cannot bind socket");
+		die("socket");
 	};
+
+	if( bind(s8010, listener8010->ai_addr, listener8010->ai_addrlen ) == -1)
+	{
+		die("bind");
+	};
+	freeaddrinfo(listener8010);
+
+	fd_set read_fds;
 
 	while(1)
 	{
-		printf("listening on port %d ...",PORT);
+		printf("listening on port %s ...",PORT);
 		fflush(stdout);
-
-		if ((received = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1)
+		FD_ZERO(&read_fds);
+		FD_SET(s8010,&read_fds);
+		if (select(s8010+1,&read_fds,NULL,NULL,NULL)==-1)
 		{
-			die("recvfrom()");
+			die("select");
+			exit(1);
 		};
+		printf("\n");
 
-		printf("received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-		printf("data: %d bytes\n" , received);
+		if (FD_ISSET(s8010,&read_fds))
+		{
+			if ((received = recvfrom(s8010, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1)
+			{
+				die("recvfrom");
+				exit(1);
+			};
 
+
+			printf("received packet from %s8010:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+			printf("data: %d bytes\n" , received);
+			fflush(stdout);
+
+			if (received!=32) continue;
+		};
 	};
 
-	close(s);
+	close(s8010);
 	return 0;
 }
