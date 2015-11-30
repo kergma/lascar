@@ -8,11 +8,33 @@
 
 #include <unistd.h>
 
-#define BUFLEN 512
+#define BUFLEN 2048
 #define PORT8010 "8010"
 #define PORT10080 "10080"
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
+
+struct device_announce
+{
+	unsigned char signature[2];
+	unsigned char unk2[2];
+	unsigned char ff6[6];
+	unsigned char ping7[7];
+	unsigned char unk3[3];
+	unsigned char mac[6];
+	unsigned char unkown[6];
+} __attribute__((__packed__));
+
+struct announce_reply
+{
+	unsigned char signature[2];
+	unsigned char unk2[2];
+	unsigned char device_mac[6];
+	unsigned char pong7[7];
+	unsigned char unk7[7];
+	uint32_t ip;
+	unsigned char zero;
+} __attribute__((__packed__));
 
 void die(char *s)
 {
@@ -57,7 +79,7 @@ int main (int argc, char *argv[])
 	socklen_t addrlen= sizeof remoteaddr;
 	char remoteIP[INET6_ADDRSTRLEN];
 
-	int s8010, s10080, received;
+	int s8010, s10080, received, sent;
 	char buf[BUFLEN];
 
 	s8010=create_listener(SOCK_DGRAM,PORT8010);
@@ -97,6 +119,24 @@ int main (int argc, char *argv[])
 				printf("received UDP packet from %s:%d\n",inet_ntop(remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN),ntohs(((struct sockaddr_in*)&remoteaddr)->sin_port));
 				printf("data: %d bytes\n" , received);
 				fflush(stdout);
+
+				if (received!=sizeof(struct device_announce)) continue;
+
+				struct device_announce a;
+				memmove(&a,buf,sizeof(a));
+
+				struct announce_reply r={{0,0},{0x20,0x01},{0,0,0,0,0,0},{0,0,0,0,0,0,0},{0x0f,0x80,0x01,0x65,0x05,0x80,0x0d},0x6a01a8c0/*ip hardcode*/,0};
+				memmove(&r.signature,&a.signature,sizeof(r.signature));
+				memmove(&r.device_mac,&a.mac,sizeof(r.device_mac));
+				memmove(&r.pong7,&a.ping7,sizeof(r.pong7));
+				r.unk7[3]=a.ping7[1];
+
+				if ((sent=sendto(s8010, &r, sizeof(r), 0, (struct sockaddr*) &remoteaddr, addrlen)) == -1)
+				{
+					die("sendto");
+					exit(1);
+				};
+				printf("reply sent: %d bytes\n" , sent);
 			}
 			else if (i==s10080)
 			{
