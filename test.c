@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #include <unistd.h>
+#include <time.h>
 
 #define BUFLEN 2048
 #define PORT8010 "8010"
@@ -101,6 +102,14 @@ int main (int argc, char *argv[])
 		read_fds=master_fds;
 		if (select(fdmax+1,&read_fds,NULL,NULL,NULL)==-1) die("select");
 		printf("\n");
+
+		#define TIMESLEN 20
+		char times[TIMESLEN];
+		time_t t=time(NULL);
+		struct tm tb;
+		localtime_r(&t,&tb);
+		strftime(times,TIMESLEN,"%Y-%m-%d %H:%M:%S",&tb);
+
 		for (int i=0;i<=fdmax;i++)
 		{
 			if (!FD_ISSET(i,&read_fds)) continue;
@@ -113,7 +122,7 @@ int main (int argc, char *argv[])
 
 				if ((received = recvmsg(i, &mh,0))==-1) die("recvmsg");
 
-				printf("received UDP packet from %s:%d\n",format_address((struct sockaddr*)&remoteaddr),ntohs(((struct sockaddr_in*)&remoteaddr)->sin_port));
+				printf("%s received UDP packet from %s:%d\n",times,format_address((struct sockaddr*)&remoteaddr),ntohs(((struct sockaddr_in*)&remoteaddr)->sin_port));
 				printf("data: %d bytes\n" , received);
 
 				struct cmsghdr *cmsg;
@@ -155,12 +164,12 @@ int main (int argc, char *argv[])
 
 				FD_SET(newfd,&master_fds);
 				fdmax=MAX(fdmax,newfd);
-				printf("TCP connection from %s:%d on socket %d\n",format_address((struct sockaddr*)&remoteaddr),ntohs(((struct sockaddr_in*)&remoteaddr)->sin_port),newfd);
+				printf("%s TCP connection from %s:%d on socket %d\n",times,format_address((struct sockaddr*)&remoteaddr),ntohs(((struct sockaddr_in*)&remoteaddr)->sin_port),newfd);
 			}
 			else if ((received = recv(i, buf, BUFLEN, 0)) <= 0)
 			{
 				if (received==0)
-					printf("TCP connection closed on socket %d\n",i);
+					printf("%s TCP connection closed on socket %d\n",times,i);
 				else
 					perror("recv");
 				close(i);
@@ -168,7 +177,7 @@ int main (int argc, char *argv[])
 			}
 			else
 			{
-				printf("received %d bytes from socket %d\n",received,i);
+				printf("%s received %d bytes from socket %d\n",times,received,i);
 			};
 		};
 
