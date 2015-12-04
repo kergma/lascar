@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "session.h"
+
 #define BUFLEN 2048
 #define PORT8010 "8010"
 #define PORT10080 "10080"
@@ -165,6 +167,13 @@ int main (int argc, char *argv[])
 				FD_SET(newfd,&master_fds);
 				fdmax=MAX(fdmax,newfd);
 				printf("%s TCP connection from %s:%d on socket %d\n",times,format_address((struct sockaddr*)&remoteaddr),ntohs(((struct sockaddr_in*)&remoteaddr)->sin_port),newfd);
+
+				#define FILENAMELEN 1024
+				char filename[FILENAMELEN];
+				strftime(times,TIMESLEN,"%Y%m%d-%H%M%S",&tb);
+				snprintf(filename,FILENAMELEN,"%s.lascar",times);
+				printf("filename %s\n",filename);
+				create_session_writer(newfd,filename);
 			}
 			else if ((received = recv(i, buf, BUFLEN, 0)) <= 0)
 			{
@@ -174,10 +183,12 @@ int main (int argc, char *argv[])
 					perror("recv");
 				close(i);
 				FD_CLR(i,&master_fds);
+				close_session_writer(i);
 			}
 			else
 			{
 				printf("%s received %d bytes from socket %d\n",times,received,i);
+				write_session_data(i,buf,received);
 			};
 		};
 
