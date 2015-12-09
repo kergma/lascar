@@ -145,6 +145,10 @@ int main (int argc, char *argv[])
 				};
 
 				fflush(stdout);
+				session *s=create_session(i);
+				session_eat(s,buf,received);
+				free_session(s);
+
 				if (received!=sizeof(struct device_announce)) continue;
 
 				struct device_announce a;

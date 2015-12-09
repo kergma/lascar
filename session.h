@@ -7,9 +7,16 @@
 typedef struct tag_session {
 	int key;
 	FILE *file;
+	char *buf;
+	size_t bufsize;
+
 	struct tag_session *next;
 
 } session;
+
+session *create_session(int key);
+void free_session(session *s);
+void session_eat(session *s, char *data, size_t len);
 
 
 session *create_session_writer(int key, const char *filename);

@@ -1,14 +1,14 @@
 #include <stdlib.h>
+#include <string.h>
 #include "session.h"
 
 static session *first=NULL;
 static session *last=NULL;
 
-session *create_session_writer(int key, const char *filename)
+session *create_session(int key)
 {
 	session *s=(session*)calloc(1,sizeof(session));
 	s->key=key;
-	s->file=fopen(filename,"wb");
 	if (last) last->next=s;
 	last=s;
 	if (!first) first=s;
@@ -25,6 +25,40 @@ session *get_session(int key, session **prev)
 		if (s->key==key) break;
 	};
 
+	return s;
+}
+
+
+void free_session(session *s)
+{
+	session *p;
+	get_session(s->key,&p);
+	if (s->file) fclose(s->file);
+	if (s->buf) free(s->buf);
+	if (p) p->next=s->next;
+	if (s==first) first=s->next;
+	if (s==last) last=p;
+	free(s);
+}
+
+void session_eat(session *s, char *data, size_t len)
+{
+	char *new_buf=(char*)calloc(1,s->bufsize+len);
+	if (s->buf) memmove(new_buf,s->buf,s->bufsize);
+	memmove(new_buf+s->bufsize,data,len);
+	free(s->buf);
+	s->buf=new_buf;
+	s->bufsize+=len;
+}
+
+session *create_session_writer(int key, const char *filename)
+{
+	session *s=(session*)calloc(1,sizeof(session));
+	s->key=key;
+	s->file=fopen(filename,"wb");
+	if (last) last->next=s;
+	last=s;
+	if (!first) first=s;
 	return s;
 }
 
