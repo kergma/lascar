@@ -1,14 +1,14 @@
 announces
 
-sig  |     |                 |  |sn|bs|                    |mac              |           |
-43 54|02 03|ff ff ff ff ff ff|0a|65|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 
-43 54|02 03|ff ff ff ff ff ff|0a|66|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 
-43 54|02 03|ff ff ff ff ff ff|0a|67|58|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 
-43 54|02 03|ff ff ff ff ff ff|0a|2b|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 
-43 54|02 03|ff ff ff ff ff ff|0a|2d|58|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 * success after usb connect
-43 54|02 03|ff ff ff ff ff ff|0a|35|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 
-43 54|02 03|ff ff ff ff ff ff|0a|39|58|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03 05|80 00 * success after usb power connect
-43 54 02 03 ff ff ff ff ff ff 0a 56 40 00 00 20 02 06 80 0f 98 8b ad 00 6d a8 10 80 03 05 80 00 * unit F
+sig  |     |                 |  |sn|bs|                    |mac              |        |   
+43 54|02 03|ff ff ff ff ff ff|0a|65|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 
+43 54|02 03|ff ff ff ff ff ff|0a|66|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 
+43 54|02 03|ff ff ff ff ff ff|0a|67|58|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 
+43 54|02 03|ff ff ff ff ff ff|0a|2b|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 
+43 54|02 03|ff ff ff ff ff ff|0a|2d|58|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 * success after usb connect
+43 54|02 03|ff ff ff ff ff ff|0a|35|40|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 
+43 54|02 03|ff ff ff ff ff ff|0a|39|58|00 00 20 02|06 80 0f|98 8b ad 00 6d a8|10 80 03|05 80 00 * success after usb power connect
+43 54 02 03 ff ff ff ff ff ff 0a 56 40 00 00 20 02 06 80 0f 98 8b ad 00 6d a8 10 80 03|05 80 00 * unit F
 
 data
 sig  |     |                 |  |sn|bs|           |        |mac              |        |name                                  |        |  |        |     |        |     |        |  |        |  |        |srate      |        |           |        |unix time  |        |scoun|
@@ -137,7 +137,6 @@ config pending scale to C alarm delay to 10s
 43 54 02 03 08 00 27 02 59 68 0a ab 40 00 00 20 0a 06 80 0f 98 8b ad 00 6d a8 0f 80 01 aa 08 80 0b 5a 5a 5a 5a 5a 5a 5a 00 02 80 05 1e 00 00 00 03 80 05 78 00 00 00 90 02 01 00 1e 80 05 00 00 00 00 50 02 01 00 60 02 01 00 a0 02 01 02 00 
 43 54 20 01 98 8b ad 00 6d a8 0a ab 40 00 00 20 02 0f 80 01 ab 07 80 05 5e bc 68 56 00 
 
-config pending low alarm on 10C, alarm delay 10s
 
 config
                                                            |sn|        |unixtime   |        |macaddr                   |name                   |        |srate      |        |comint     |        |F |        |           |        |  |        |  |        |  | 

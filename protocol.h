@@ -31,4 +31,14 @@ typedef enum tag_datatype {
 } datatype;
 
 
+typedef struct tag_value_descriptor {
+	key k;
+	field f;
+	datatype t;
+} __attribute__((__packed__)) value_descriptor;
+
+
+void parse_header(char *buf, int *pos, unsigned char *dest_mac, unsigned char *seqno, unsigned char *battery_status);
+void parse_value(char *buf, int *pos, value_descriptor **desc, void **value, int *value_size);
+
 #endif
