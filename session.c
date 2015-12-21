@@ -65,6 +65,10 @@ void session_respond_announce(session *s, struct in_addr host_addr)
 
 	parse_header(s->buf,&i,dest_mac,&seqno,&battery_status);
 
+	hash h;
+	parse_values(s->buf, s->buflen, &i, &h);
+
+
 
 
 }
