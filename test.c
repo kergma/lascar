@@ -75,6 +75,7 @@ int create_listener(int socktype, const char *service)
 	return s;
 
 }
+#include "protocol.h"
 int main (int argc, char *argv[])
 {
 	struct sockaddr_storage remoteaddr;
@@ -147,6 +148,9 @@ int main (int argc, char *argv[])
 				fflush(stdout);
 				session *s=create_session(i);
 				session_eat(s,buf,received);
+
+				session_respond_announce(s,pi->ipi_spec_dst);
+
 				free_session(s);
 
 				if (received!=sizeof(struct device_announce)) continue;

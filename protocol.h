@@ -42,7 +42,7 @@ typedef struct tag_value_descriptor {
 typedef struct hash_item {field f; datatype t; void *v;} __attribute__((__packed__)) hash[LP_LAST];
 
 void parse_header(char *buf, int *pos, unsigned char *dest_mac, unsigned char *seqno, unsigned char *battery_status);
-void parse_value(char *buf, int *pos, value_descriptor **desc, void **value, int *value_size);
 void parse_values(char *buf, size_t buflen, int *pos, hash *h);
+void print_hash(hash *h);
 
 #endif

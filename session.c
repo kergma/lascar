@@ -59,17 +59,16 @@ void session_respond_announce(session *s, struct in_addr host_addr)
 	s->relen=29;
 	s->re=(char*)calloc(1,s->relen);
 
-	int i=0;
+	int p=0;
 	unsigned char dest_mac[6];
 	unsigned char seqno, battery_status;
 
-	parse_header(s->buf,&i,dest_mac,&seqno,&battery_status);
+	parse_header(s->buf,&p,dest_mac,&seqno,&battery_status);
 
 	hash h;
-	parse_values(s->buf, s->buflen, &i, &h);
-
-
-
+	memset(&h,0,sizeof(h));
+	parse_values(s->buf, s->buflen, &p, &h);
+	print_hash(&h);
 
 }
 
