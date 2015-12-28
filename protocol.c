@@ -1,11 +1,12 @@
 #include <string.h>
+#include <arpa/inet.h>
 #include "protocol.h"
 
-key keys[]={LP_SOMETHING, LP_SAMPLE_RATE, LP_COMM_INTERVAL, LP_SOURCE_MAC, LP_HOST_TIME, LP_DEVICE_NAME, LP_SEQ_NO, LP_SAMPLES_COUNT, LP_TIME_OFFSET, LP_DEVICE_TIME, LP_ALARM_DELAY, LP_FAHRENHEIT};
+key keys[]={LP_SOMETHING, LP_SAMPLE_RATE, LP_COMM_INTERVAL, LP_SOURCE_MAC, LP_HOST_TIME, LP_DEVICE_NAME, LP_KEY09, LP_SEQ_NO, LP_SAMPLES_COUNT, LP_TIME_OFFSET, LP_DEVICE_TIME, LP_ALARM_DELAY, LP_KEY50, LP_KEY60, LP_FAHRENHEIT};
 
-field fields[]={LP_BOOL, LP_RECORD, LP_VALUE};
+field fields[]={LP_BOOL, LP_FIELD06, LP_RECORD, LP_VALUE};
 
-datatype datatypes[]={LP_CHAR, LP_SHORTINT, LP_UNIXTIME, LP_STRING, LP_MACADDR};
+datatype datatypes[]={LP_CHAR, LP_SHORTINT, LP_UNIXTIME, LP_STRING, LP_TYPE0C, LP_MACADDR, LP_TYPE63};
 
 void parse_header(char *buf, int *pos, unsigned char *dest_mac, unsigned char *seqno, unsigned char *battery_status)
 {
@@ -32,7 +33,7 @@ size_t value_len(struct hash_item i)
 	switch (i.t)
 	{
 		case LP_CHAR: return 1; break;
-		case LP_SHORTINT: return 2; break;
+		case LP_SHORTINT: case LP_TYPE0C: case LP_TYPE63: return 2; break;
 		case LP_UNIXTIME: return 4; break;
 		case LP_STRING: return strlen((char*)i.v)+1; break;
 		case LP_MACADDR: return 6; break;
@@ -53,10 +54,13 @@ void print_hash(hash *h)
 		case LP_SAMPLE_RATE: printf("sample rate %d\n",*(int*)i.v); break;
 		case LP_SOURCE_MAC: printf("source mac address %02x:%02x:%02x:%02x:%02x:%02x\n",*(unsigned char*)i.v,*(unsigned char*)(i.v+1),*(unsigned char*)(i.v+2),*(unsigned char*)(i.v+3),*(unsigned char*)(i.v+4),*(unsigned char*)(i.v+5)); break;
 		case LP_DEVICE_NAME: printf("device name %s\n",(char*)i.v); break;
+		case LP_SAMPLES_COUNT: printf("samples count %d\n",*(short int*)i.v); break;
+		case LP_TIME_OFFSET: printf("time offset %d\n",*(long int*)i.v); break;
+		case LP_DEVICE_TIME: printf("device time %d\n",*(long int*)i.v); break;
 	default:
 		l=value_len(i);
 		printf("unprintable value 0x%x (%d bytes)",k,l);
-		for (b=0;b<l;b++) printf(" %02x",*(char*)(i.v+b));
+		for (b=0;b<l;b++) printf(" %02x",*(unsigned char*)(i.v+b));
 		printf("\n");
 	};
 }
